@@ -1,13 +1,22 @@
 package com.github.justadeni.minechem.machines
 
 import com.github.justadeni.minechem.MineChem
+import org.apache.commons.codec.binary.Base32
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.NamespacedKey
 import org.bukkit.entity.Entity
+import org.bukkit.inventory.Inventory
 import org.bukkit.persistence.PersistentDataType
+import org.bukkit.util.io.BukkitObjectInputStream
+import org.bukkit.util.io.BukkitObjectOutputStream
+import org.yaml.snakeyaml.external.biz.base64Coder.Base64Coder
+import java.io.ByteArrayInputStream
+import java.io.ByteArrayOutputStream
+import java.io.IOException
 import java.util.*
 import kotlin.math.roundToInt
+
 
 object Data {
 
@@ -41,10 +50,40 @@ object Data {
      */
     fun Entity.putLoc(value : Location){
         with(this.persistentDataContainer) {
-            set(NamespacedKey(MineChem.plugin, "world"), PersistentDataType.STRING, value.world!!.uid.toString())
+            set(NamespacedKey(MineChem.plugin, "world"), PersistentDataType.STRING, value.world!!.uid.toString().lowercase())
             set(NamespacedKey(MineChem.plugin, "x"), PersistentDataType.INTEGER, value.x.roundToInt())
             set(NamespacedKey(MineChem.plugin, "y"), PersistentDataType.INTEGER, value.y.roundToInt())
             set(NamespacedKey(MineChem.plugin, "z"), PersistentDataType.INTEGER, value.z.roundToInt())
+        }
+    }
+
+    fun Entity.putInv(inventory : Inventory){
+        with(this.persistentDataContainer) {
+            try {
+                val outputStream = ByteArrayOutputStream()
+                val dataOutput = BukkitObjectOutputStream(outputStream)
+                dataOutput.writeObject(inventory)
+                dataOutput.close()
+                val encoded = Base32().encodeToString(outputStream.toByteArray()).lowercase().replace("=","-")
+                set(NamespacedKey(MineChem.plugin, "inventory"), PersistentDataType.STRING, encoded)
+            } catch (e: Exception) {
+                throw IllegalStateException("Unable to save inventory.", e)
+            }
+        }
+    }
+
+    fun Entity.getInv() : Inventory{
+        with(this.persistentDataContainer){
+            try {
+                val encoded = get(NamespacedKey(MineChem.plugin, "inventory"), PersistentDataType.STRING)?.uppercase()?.replace("-","=")
+                val inputStream = ByteArrayInputStream(Base32().decode(encoded))
+                val bukkitstream = BukkitObjectInputStream(inputStream)
+                bukkitstream.use { dataInput ->
+                    return dataInput.readObject() as Inventory
+                }
+            } catch (e: ClassNotFoundException) {
+                throw IOException("Unable to decode class type.", e)
+            }
         }
     }
 
