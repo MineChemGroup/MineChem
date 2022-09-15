@@ -2,6 +2,8 @@ package com.github.justadeni.minechem.listeners
 
 import com.github.justadeni.minechem.MineChem
 import com.github.justadeni.minechem.enums.MachineEnum
+import com.github.justadeni.minechem.machines.Data.putInt
+import com.github.justadeni.minechem.machines.Data.putLoc
 import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.entity.ArmorStand
@@ -14,8 +16,6 @@ import org.bukkit.metadata.FixedMetadataValue
 import kotlin.math.abs
 
 object BlockPlace : Listener{
-
-    val locs = arrayListOf<Location>()
 
     private fun List<Float>.closestValue(value: Float) = minByOrNull { abs(value - it) }
 
@@ -36,10 +36,9 @@ object BlockPlace : Listener{
         if (e.itemInHand.type != Material.STONE)
             return
 
-        if (!e.itemInHand.hasItemMeta())
-            return
+        val machineid = e.itemInHand.itemMeta?.customModelData ?: return
 
-        if (!MachineEnum.exists(e.itemInHand.itemMeta!!.customModelData))
+        if (!MachineEnum.exists(machineid))
             return
 
         e.block.type = Material.BARRIER
@@ -55,9 +54,7 @@ object BlockPlace : Listener{
         val mainstandyaw : Float = angles.closestValue(yaw)!!
         mainstand.teleport(Location(loc.world, loc.x+0.5,loc.y,loc.z+0.5, mainstandyaw, loc.pitch))
 
-        e.player.sendMessage("$yaw  $mainstandyaw")
-
-        val jointid = MachineEnum.joint(e.itemInHand.itemMeta!!.customModelData)
+        val jointid = MachineEnum.joint(machineid)
         if (jointid != 0){
             var jointstand : ArmorStand = loc.world?.spawnEntity(Location(loc.world,loc.x,loc.y+100,loc.z),EntityType.ARMOR_STAND) as ArmorStand
             e.block.setMetadata("uuid1", FixedMetadataValue(MineChem.plugin, jointstand.uniqueId))
@@ -78,8 +75,11 @@ object BlockPlace : Listener{
             }
 
             jointstand.teleport(Location(loc.world,loc.x+0.5,loc.y,loc.z+0.5, jointstandyaw, loc.pitch))
+            jointstand.putLoc(loc)
+            jointstand.putInt("machineid", jointid)
         }
 
-        locs.add(loc)
+        mainstand.putLoc(loc)
+        mainstand.putInt("machineid", machineid)
     }
 }

@@ -19,11 +19,11 @@ object Elements {
         meta?.setDisplayName(element.fullName().cap().clearcolor())
         val lore = arrayListOf<String>()
 
-        lore.add("Atomic number: " + element.atomicNumber())
-        lore.add("Cathegory: " + element.category().toString().lowercase().cap())
-        lore.add("Occurrence: " + element.occurence().toString().lowercase().cap())
+        lore.add(("Atomic number: " + element.atomicNumber()).clearcolor())
+        lore.add(("Cathegory: " + element.category().toString().lowercase().cap()).clearcolor())
+        lore.add(("Occurrence: " + element.occurence().toString().lowercase().cap()).clearcolor())
         if (element.radioactive())
-            lore.add("Radioactive")
+            lore.add("Radioactive".clearcolor())
         meta?.lore = lore
         item.itemMeta = meta
         return item

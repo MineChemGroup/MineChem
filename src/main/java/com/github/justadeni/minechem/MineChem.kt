@@ -1,9 +1,7 @@
 package com.github.justadeni.minechem
 
 import com.github.justadeni.minechem.command.Command
-import com.github.justadeni.minechem.listeners.BlockBreak
-import com.github.justadeni.minechem.listeners.BlockClick
-import com.github.justadeni.minechem.listeners.BlockPlace
+import com.github.justadeni.minechem.listeners.*
 import org.bukkit.plugin.java.JavaPlugin
 
 class MineChem : JavaPlugin() {
@@ -16,6 +14,8 @@ class MineChem : JavaPlugin() {
         server.pluginManager.registerEvents(BlockPlace, this)
         server.pluginManager.registerEvents(BlockClick, this)
         server.pluginManager.registerEvents(BlockBreak, this)
+        server.pluginManager.registerEvents(ChunkLoad, this)
+        server.pluginManager.registerEvents(ChunkUnload, this)
         getCommand("minechem")?.setExecutor(Command)
     }
 
