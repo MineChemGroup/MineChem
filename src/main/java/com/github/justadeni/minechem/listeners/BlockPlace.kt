@@ -2,8 +2,12 @@ package com.github.justadeni.minechem.listeners
 
 import com.github.justadeni.minechem.MineChem
 import com.github.justadeni.minechem.enums.MachineEnum
-import com.github.justadeni.minechem.machines.Data.putInt
-import com.github.justadeni.minechem.machines.Data.putLoc
+import com.github.justadeni.minechem.data.Saver.putInt
+import com.github.justadeni.minechem.data.Saver.putInv
+import com.github.justadeni.minechem.data.Saver.putLoc
+import com.github.justadeni.minechem.data.Saver.putString
+import com.github.justadeni.minechem.machines.Machine
+import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.entity.ArmorStand
@@ -75,11 +79,18 @@ object BlockPlace : Listener{
             }
 
             jointstand.teleport(Location(loc.world,loc.x+0.5,loc.y,loc.z+0.5, jointstandyaw, loc.pitch))
-            jointstand.putLoc(loc)
-            jointstand.putInt("machineid", jointid)
+            mainstand.putString("uuid1", jointstand.uniqueId.toString())
+        } else {
+            mainstand.putString("uuid1", "")
         }
-
+        mainstand.putString("uuid0", mainstand.uniqueId.toString())
         mainstand.putLoc(loc)
+        mainstand.putInv(Bukkit.createInventory(null, 9, MachineEnum.name(machineid)))
         mainstand.putInt("machineid", machineid)
+        mainstand.putInt("energy", 0)
+        Machine.load(loc)
+        val machine = Machine.get(loc)
+        machine?.save()
+        println(Machine.list.toString())
     }
 }

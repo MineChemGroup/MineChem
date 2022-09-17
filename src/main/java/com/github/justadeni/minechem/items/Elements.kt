@@ -1,13 +1,11 @@
 package com.github.justadeni.minechem.items
 
-import com.github.justadeni.minechem.enums.MachineEnum
-import com.github.justadeni.minechem.misc.Helpers.cap
-import com.github.justadeni.minechem.misc.Helpers.clearcolor
-import com.github.justadeni.minechem.misc.Helpers.radioactive
+import com.github.justadeni.minechem.data.Helpers.cap
+import com.github.justadeni.minechem.data.Helpers.clearcolor
+import com.github.justadeni.minechem.data.Helpers.radioactive
 import eu.hoefel.chemistry.Element
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
-import java.util.*
 
 object Elements {
 

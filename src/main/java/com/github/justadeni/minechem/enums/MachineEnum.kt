@@ -1,6 +1,6 @@
 package com.github.justadeni.minechem.enums
 
-import com.github.justadeni.minechem.misc.Helpers.clearcolor
+import com.github.justadeni.minechem.data.Helpers.clearcolor
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
 
@@ -14,7 +14,7 @@ enum class MachineEnum(val id : Int, val displayname : String, val joint : Int) 
 
     companion object {
 
-        private fun name(id : Int) : String{
+        fun name(id : Int) : String{
             for (machine in MachineEnum.values())
                 if (machine.id == id)
                     return machine.displayname

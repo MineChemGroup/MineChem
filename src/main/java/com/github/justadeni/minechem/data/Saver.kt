@@ -1,16 +1,17 @@
-package com.github.justadeni.minechem.machines
+package com.github.justadeni.minechem.data
 
 import com.github.justadeni.minechem.MineChem
 import org.apache.commons.codec.binary.Base32
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.NamespacedKey
+import org.bukkit.craftbukkit.v1_19_R1.CraftWorld
+import org.bukkit.craftbukkit.v1_19_R1.entity.CraftEntity
 import org.bukkit.entity.Entity
 import org.bukkit.inventory.Inventory
 import org.bukkit.persistence.PersistentDataType
 import org.bukkit.util.io.BukkitObjectInputStream
 import org.bukkit.util.io.BukkitObjectOutputStream
-import org.yaml.snakeyaml.external.biz.base64Coder.Base64Coder
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.IOException
@@ -18,16 +19,16 @@ import java.util.*
 import kotlin.math.roundToInt
 
 
-object Data {
+object Saver {
 
     /**
      * checks if entity has string or int stored under specified key
      * @key         all keys are strings
      */
-    fun Entity.has(key: String) : Boolean{
+    fun Entity.hasString(key: String) : Boolean{
         val nsk = NamespacedKey(MineChem.plugin, key)
         with(this.persistentDataContainer){
-            return has(nsk, PersistentDataType.STRING) || has(nsk, PersistentDataType.INTEGER)
+            return this.has(nsk, PersistentDataType.STRING)
         }
     }
 
@@ -57,6 +58,7 @@ object Data {
         }
     }
 
+    //TODO: Redo Serialization completely
     fun Entity.putInv(inventory : Inventory){
         with(this.persistentDataContainer) {
             try {
@@ -87,12 +89,12 @@ object Data {
         }
     }
 
-    fun Entity.getString(key : String) : String?{
-        return this.persistentDataContainer.get(NamespacedKey(MineChem.plugin, key), PersistentDataType.STRING)
+    fun Entity.getString(key : String) : String{
+        return this.persistentDataContainer.get(NamespacedKey(MineChem.plugin, key), PersistentDataType.STRING)!!
     }
 
-    fun Entity.getInt(key: String) : Int?{
-        return this.persistentDataContainer.get(NamespacedKey(MineChem.plugin, key), PersistentDataType.INTEGER)
+    fun Entity.getInt(key: String) : Int{
+        return this.persistentDataContainer.get(NamespacedKey(MineChem.plugin, key), PersistentDataType.INTEGER)!!
     }
 
     fun Entity.getLoc() : Location {
@@ -104,5 +106,10 @@ object Data {
 
             return Location(world, x!!.toDouble(), y!!.toDouble(), z!!.toDouble())
         }
+    }
+
+    fun Entity.getJoint(): CraftEntity? {
+        val world = (world as CraftWorld).handle
+        return world.getEntity(UUID.fromString(getString("uuid1")))?.bukkitEntity
     }
 }

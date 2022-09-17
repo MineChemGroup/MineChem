@@ -2,6 +2,7 @@ package com.github.justadeni.minechem
 
 import com.github.justadeni.minechem.command.Command
 import com.github.justadeni.minechem.listeners.*
+import com.github.justadeni.minechem.machines.Machine
 import org.bukkit.plugin.java.JavaPlugin
 
 class MineChem : JavaPlugin() {
@@ -20,6 +21,7 @@ class MineChem : JavaPlugin() {
     }
 
     override fun onDisable() {
-
+        for (machine in Machine.list)
+            machine.save()
     }
 }
