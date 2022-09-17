@@ -1,5 +1,6 @@
 package com.github.justadeni.minechem.data
 
+import com.github.justadeni.minechem.data.Saver.hasString
 import eu.hoefel.chemistry.Element
 import net.minecraft.world.entity.Entity
 import org.bukkit.ChatColor
@@ -29,6 +30,10 @@ object Helpers {
 
     fun getEntity(loc : Location): CraftEntity? {
         val world = (loc.world as CraftWorld).handle
-        return world.getEntity(loc.block.getMetadata("uuid0")[0].value() as UUID)?.bukkitEntity
+        for (entity in loc.chunk.entities){
+            if (entity.hasString("uuid0"))
+                return world.getEntity(entity.uniqueId)?.bukkitEntity
+        }
+        return null
     }
 }

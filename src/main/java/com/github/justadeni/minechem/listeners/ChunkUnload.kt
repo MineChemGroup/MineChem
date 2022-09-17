@@ -17,13 +17,10 @@ object ChunkUnload : Listener {
             if (entity.type != EntityType.ARMOR_STAND)
                 return
 
-            println("debug3")
             if (entity.hasString("uuid0")) {
-                println("debug4")
                 val machine = Machine.get(entity.getLoc()) ?: return
                 machine.save()
                 machine.unload()
-                println("debug5")
             }
         }
     }

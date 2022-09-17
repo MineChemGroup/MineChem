@@ -17,6 +17,7 @@ class MineChem : JavaPlugin() {
         server.pluginManager.registerEvents(BlockBreak, this)
         server.pluginManager.registerEvents(ChunkLoad, this)
         server.pluginManager.registerEvents(ChunkUnload, this)
+        server.pluginManager.registerEvents(InventoryClose, this)
         getCommand("minechem")?.setExecutor(Command)
     }
 

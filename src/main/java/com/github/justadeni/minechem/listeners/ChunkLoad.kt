@@ -16,11 +16,8 @@ object ChunkLoad : Listener {
             if (entity.type != EntityType.ARMOR_STAND)
                 return
 
-            println("debug0")
             if (entity.hasString("uuid0")){
-                println("debug1")
                 Machine.load(entity.getLoc())
-                println("debug2")
             }
         }
     }

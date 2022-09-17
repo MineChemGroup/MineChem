@@ -2,31 +2,19 @@ package com.github.justadeni.minechem.data
 
 import com.github.justadeni.minechem.MineChem
 import com.github.justadeni.minechem.enums.MachineEnum
-import org.apache.commons.codec.binary.Base32
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.NamespacedKey
-import org.bukkit.craftbukkit.v1_19_R1.CraftWorld
-import org.bukkit.craftbukkit.v1_19_R1.entity.CraftEntity
 import org.bukkit.entity.Entity
 import org.bukkit.inventory.Inventory
-import org.bukkit.inventory.ItemStack
 import org.bukkit.persistence.PersistentDataType
-import org.bukkit.util.io.BukkitObjectInputStream
-import org.bukkit.util.io.BukkitObjectOutputStream
-import java.io.ByteArrayInputStream
-import java.io.ByteArrayOutputStream
-import java.io.IOException
 import java.util.*
 import kotlin.math.roundToInt
 
 
 object Saver {
 
-    /**
-     * checks if entity has string or int stored under specified key
-     * @key         all keys are strings
-     */
+
     fun Entity.hasString(key: String) : Boolean{
         val nsk = NamespacedKey(MineChem.plugin, key)
         with(this.persistentDataContainer){
@@ -34,23 +22,14 @@ object Saver {
         }
     }
 
-    /**
-     * puts key and value into entity nbt
-     */
     fun Entity.putString(key : String, value : String){
         this.persistentDataContainer.set(NamespacedKey(MineChem.plugin, key), PersistentDataType.STRING, value)
     }
 
-    /**
-     * puts key and value into entity nbt
-     */
     fun Entity.putInt(key : String, value : Int){
         this.persistentDataContainer.set(NamespacedKey(MineChem.plugin, key), PersistentDataType.INTEGER, value)
     }
 
-    /**
-     * puts location of machine block into entity nbt with 4 tags
-     */
     fun Entity.putLoc(value : Location){
         with(this.persistentDataContainer) {
             set(NamespacedKey(MineChem.plugin, "world"), PersistentDataType.STRING, value.world!!.uid.toString().lowercase())
@@ -61,34 +40,13 @@ object Saver {
     }
 
     fun Entity.putInv(inventory : Inventory){
-        //with(this.persistentDataContainer) {
-            var positions = ""
-            for (i in 0..35) {
-                val item = inventory.getItem(i)
-                if (item != null && !item.type.isAir) {
-                    positions += i.toString()
-                    if (i < 35)
-                        positions += "-"
-
-                    putString(i.toString(), Conversor.serializeItemStack(item))
-                }
-            }
-            putString("positions", positions)
-        //}
+        val nsk = NamespacedKey(MineChem.plugin, "inventory")
+        persistentDataContainer.set(nsk, PersistentDataType.BYTE_ARRAY, ItemSerialization.toByteArray(inventory))
     }
 
     fun Entity.getInv() : Inventory{
-        //with(this.persistentDataContainer){
-            val positions = arrayListOf<Int>().apply {
-                for (i in getString("positions").split("-"))
-                    add(i.toInt())
-            }
-            val inventory = Bukkit.createInventory(null, 36, MachineEnum.name(getInt("machineid")))
-            for (i in positions){
-                inventory.setItem(i, Conversor.deserializeItemStack(getString(i.toString())))
-            }
-            return inventory
-        //}
+        val nsk = NamespacedKey(MineChem.plugin, "inventory")
+        return ItemSerialization.fromByteArray(persistentDataContainer.get(nsk, PersistentDataType.BYTE_ARRAY)!!, MachineEnum.name(getInt("machineid")))!!
     }
 
     fun Entity.getString(key : String) : String{
@@ -108,10 +66,5 @@ object Saver {
 
             return Location(world, x!!.toDouble(), y!!.toDouble(), z!!.toDouble())
         }
-    }
-
-    fun Entity.getJoint(): CraftEntity? {
-        val world = (world as CraftWorld).handle
-        return world.getEntity(UUID.fromString(getString("uuid1")))?.bukkitEntity
     }
 }

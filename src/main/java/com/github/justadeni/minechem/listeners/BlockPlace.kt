@@ -16,7 +16,6 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.block.BlockPlaceEvent
 import org.bukkit.inventory.EquipmentSlot
-import org.bukkit.metadata.FixedMetadataValue
 import kotlin.math.abs
 
 object BlockPlace : Listener{
@@ -49,9 +48,7 @@ object BlockPlace : Listener{
 
         val loc = e.block.location
         var mainstand : ArmorStand = loc.world?.spawnEntity(Location(loc.world, loc.x,loc.y+100,loc.z),EntityType.ARMOR_STAND) as ArmorStand
-        e.block.setMetadata("uuid0", FixedMetadataValue(MineChem.plugin, mainstand.uniqueId))
-        val mainhelmet = mainstand.equipment
-        mainhelmet?.setHelmet(e.itemInHand, true)
+        mainstand.equipment?.setHelmet(e.itemInHand, true)
         mainstand = mainstand.init()
         val yaw = e.player.location.yaw
         val angles = arrayListOf(0f,90f,180f,-90f)
@@ -61,9 +58,7 @@ object BlockPlace : Listener{
         val jointid = MachineEnum.joint(machineid)
         if (jointid != 0){
             var jointstand : ArmorStand = loc.world?.spawnEntity(Location(loc.world,loc.x,loc.y+100,loc.z),EntityType.ARMOR_STAND) as ArmorStand
-            e.block.setMetadata("uuid1", FixedMetadataValue(MineChem.plugin, jointstand.uniqueId))
-            val jointhelmet = jointstand.equipment
-            jointhelmet?.setHelmet(MachineEnum.item(jointid), true)
+            jointstand.equipment?.setHelmet(MachineEnum.item(jointid), true)
             jointstand = jointstand.init()
 
             val jointstandyaw = if (jointid == 4){
@@ -85,12 +80,11 @@ object BlockPlace : Listener{
         }
         mainstand.putString("uuid0", mainstand.uniqueId.toString())
         mainstand.putLoc(loc)
-        mainstand.putInv(Bukkit.createInventory(null, 9, MachineEnum.name(machineid)))
+        mainstand.putInv(Bukkit.createInventory(null, 36, MachineEnum.name(machineid)))
         mainstand.putInt("machineid", machineid)
         mainstand.putInt("energy", 0)
         Machine.load(loc)
-        val machine = Machine.get(loc)
-        machine?.save()
-        println(Machine.list.toString())
+        val machine = Machine.get(loc)!!
+        machine.save()
     }
 }

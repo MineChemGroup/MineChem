@@ -6,10 +6,12 @@ import com.github.justadeni.minechem.data.Saver.getString
 import com.github.justadeni.minechem.data.Saver.putInt
 import com.github.justadeni.minechem.data.Saver.putInv
 import com.github.justadeni.minechem.data.Helpers.getEntity
+import com.github.justadeni.minechem.data.Saver.hasString
 import org.bukkit.Location
 import org.bukkit.craftbukkit.v1_19_R1.CraftWorld
 import org.bukkit.craftbukkit.v1_19_R1.entity.CraftEntity
 import org.bukkit.inventory.Inventory
+import java.io.Serializable
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -17,7 +19,7 @@ abstract class Machine(val uuid0: String,
                        val uuid1: String,
                        val inventory: Inventory,
                        val energy: Int,
-                       val loc: Location) {
+                       val loc: Location){
 
     companion object {
         val list = arrayListOf<Machine>()
@@ -31,7 +33,13 @@ abstract class Machine(val uuid0: String,
         }
 
         fun load(loc: Location){
-            with(getEntity(loc)!!) {
+            val entity = getEntity(loc)!!
+
+            with(entity) {
+                if (hasString("inventory")){
+                    println(getString("inventory"))
+                }
+
                 when (getInt("machineid")) {
                     1 -> list.add(Microscope(getString("uuid0"), getString("uuid1"), getInv(), getInt("energy"), loc))
                     2 -> list.add(Decomposer(getString("uuid0"), getString("uuid1"), getInv(), getInt("energy"), loc))
