@@ -1,6 +1,7 @@
 package com.github.justadeni.minechem.data
 
 import com.github.justadeni.minechem.MineChem
+import com.github.justadeni.minechem.enums.MachineEnum
 import org.apache.commons.codec.binary.Base32
 import org.bukkit.Bukkit
 import org.bukkit.Location
@@ -9,6 +10,7 @@ import org.bukkit.craftbukkit.v1_19_R1.CraftWorld
 import org.bukkit.craftbukkit.v1_19_R1.entity.CraftEntity
 import org.bukkit.entity.Entity
 import org.bukkit.inventory.Inventory
+import org.bukkit.inventory.ItemStack
 import org.bukkit.persistence.PersistentDataType
 import org.bukkit.util.io.BukkitObjectInputStream
 import org.bukkit.util.io.BukkitObjectOutputStream
@@ -58,35 +60,35 @@ object Saver {
         }
     }
 
-    //TODO: Redo Serialization completely
     fun Entity.putInv(inventory : Inventory){
-        with(this.persistentDataContainer) {
-            try {
-                val outputStream = ByteArrayOutputStream()
-                val dataOutput = BukkitObjectOutputStream(outputStream)
-                dataOutput.writeObject(inventory)
-                dataOutput.close()
-                val encoded = Base32().encodeToString(outputStream.toByteArray()).lowercase().replace("=","-")
-                set(NamespacedKey(MineChem.plugin, "inventory"), PersistentDataType.STRING, encoded)
-            } catch (e: Exception) {
-                throw IllegalStateException("Unable to save inventory.", e)
+        //with(this.persistentDataContainer) {
+            var positions = ""
+            for (i in 0..35) {
+                val item = inventory.getItem(i)
+                if (item != null && !item.type.isAir) {
+                    positions += i.toString()
+                    if (i < 35)
+                        positions += "-"
+
+                    putString(i.toString(), Conversor.serializeItemStack(item))
+                }
             }
-        }
+            putString("positions", positions)
+        //}
     }
 
     fun Entity.getInv() : Inventory{
-        with(this.persistentDataContainer){
-            try {
-                val encoded = get(NamespacedKey(MineChem.plugin, "inventory"), PersistentDataType.STRING)?.uppercase()?.replace("-","=")
-                val inputStream = ByteArrayInputStream(Base32().decode(encoded))
-                val bukkitstream = BukkitObjectInputStream(inputStream)
-                bukkitstream.use { dataInput ->
-                    return dataInput.readObject() as Inventory
-                }
-            } catch (e: ClassNotFoundException) {
-                throw IOException("Unable to decode class type.", e)
+        //with(this.persistentDataContainer){
+            val positions = arrayListOf<Int>().apply {
+                for (i in getString("positions").split("-"))
+                    add(i.toInt())
             }
-        }
+            val inventory = Bukkit.createInventory(null, 36, MachineEnum.name(getInt("machineid")))
+            for (i in positions){
+                inventory.setItem(i, Conversor.deserializeItemStack(getString(i.toString())))
+            }
+            return inventory
+        //}
     }
 
     fun Entity.getString(key : String) : String{
