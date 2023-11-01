@@ -23,13 +23,8 @@ object BlockClick : Listener {
 
         if (e.action == Action.LEFT_CLICK_BLOCK) {
 
-            val machine = Machine.get(loc) ?: return
-            machine.delete()
-            block.type = Material.AIR
         } else if (e.action == Action.RIGHT_CLICK_BLOCK) {
-            Machine.load(loc)
-            val machine = Machine.get(loc) ?: return
-            e.player.openInventory(machine.inventory)
+
         }
     }
 }

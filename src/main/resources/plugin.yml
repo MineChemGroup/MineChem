@@ -3,7 +3,7 @@ version: '${project.version}'
 main: com.github.justadeni.minechem.MineChem
 api-version: 1.19
 load: STARTUP
-depend: [NBTAPI]
+depend: [StandAPI, ProtocolLib, kLib]
 commands:
   minechem:
     usage: /minechem <subcommand> <id>

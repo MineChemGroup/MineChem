@@ -1,8 +1,9 @@
 package com.github.justadeni.minechem.command
 
-import com.github.justadeni.minechem.MineChem
-import com.github.justadeni.minechem.enums.MachineEnum
+import com.github.justadeni.minechem.items.Compounds
 import com.github.justadeni.minechem.items.Elements
+import com.github.justadeni.minechem.data.Helpers
+import com.github.justadeni.minechem.data.Helpers.add
 import org.bukkit.command.Command
 import org.bukkit.command.CommandExecutor
 import org.bukkit.command.CommandSender
@@ -17,22 +18,12 @@ object Command : CommandExecutor {
         if (sender !is Player)
             return false
 
-        when (args.size){
-            0 -> {
-                sender.sendMessage("Insufficient arguments")
-            }
-            1 -> {
-                sender.sendMessage("Insufficient arguments")
-            }
-            2 -> {
-                if (sender.inventory.itemInMainHand.type.isAir)
-                    when (args[0]) {
-                        "machine" -> sender.inventory.setItemInMainHand(MachineEnum.item(args[1].toInt()))
-                        "element" -> sender.inventory.setItemInMainHand(Elements.item(args[1].toInt()))
-                    }
 
-            }
-        }
+        if (args.size == 0 || args.size > 3)
+            return false
+
+
+
         return true
     }
 
